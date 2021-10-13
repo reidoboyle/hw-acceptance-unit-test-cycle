@@ -1,5 +1,15 @@
 class MoviesController < ApplicationController
 
+  def directors
+    @movie = Movie.find params[:id]
+    director = @movie.director
+    if director == "" or director == nil
+      redirect_to movies_path
+      flash[:notice] = "'#{@movie.title}' has no director info"
+    end
+    @movies = Movie.find_directors(director)
+  end
+  
   def show
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
@@ -42,6 +52,6 @@ class MoviesController < ApplicationController
   # Making "internal" methods private is not required, but is a common practice.
   # This helps make clear which methods respond to requests, and which ones do not.
   def movie_params
-    params.require(:movie).permit(:title, :rating, :description, :release_date)
+    params.require(:movie).permit(:title, :rating,:director, :description, :release_date)
   end
 end
