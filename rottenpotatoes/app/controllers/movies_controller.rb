@@ -17,7 +17,38 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    @all_ratings = Movie.ratings
+    @checks = Movie.checked
+    @rel = false
+    @tit = false
+      
+    if (!params.has_key?(:ratings)) and (!session.has_key?(:ratings))
+      session[:ratings] = Movie.inital_ratings
+    end
+      
+    if params[:sort_by] == "release_date"
+      session[:sort_by] = "release_date"
+    elsif params[:sort_by] == "title"
+      session[:sort_by] = "title"
+    end
+      
+    if params.has_key?(:ratings)
+      session[:ratings] = params[:ratings]
+    else
+      flash.keep
+      redirect_to movies_path(:ratings => session[:ratings],:sort_by => session[:sort_by])
+    end
+      
+    @movies = Movie.order("#{session[:sort_by]}")
+    @movies = @movies.with_ratings(session[:ratings].keys)
+    @checks = Movie.update_check(@checks,session[:ratings].keys)
+      
+    if session[:sort_by] == "title"
+      @tit = true
+    end
+    if session[:sort_by] == "release_date"
+      @rel = true
+    end
   end
 
   def new

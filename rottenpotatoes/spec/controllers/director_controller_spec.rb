@@ -40,5 +40,7 @@ describe MoviesController do
             response.should redirect_to('/movies')
         end
     end
+    
+
 end
 
